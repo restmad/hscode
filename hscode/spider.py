@@ -17,7 +17,9 @@ def url2html(url, proxy):
     url_link = BASE_URL + url
     if proxy:
         url_link = proxy.replace('{url}', url_link)
-    response = requests.get(url_link, timeout=1)
+
+    print('url_link', url_link)
+    response = requests.get(url_link, timeout=10)
     if response.status_code == 404:
         return ''
     response.encoding = 'utf-8'
@@ -105,7 +107,7 @@ def parse_tax_info(_code, details_div):
     ex_rebate = tax_result.get('出口退税税率')
     ex_provisional = tax_result.get('出口暂定税率')
     vat = tax_result.get('增值税率')
-    preferential = tax_result.get('进口优惠税率')
+    preferential = tax_result.get('最惠国税率')
     im_provisional = tax_result.get('进口暂定税率')
     import_ = tax_result.get('进口普通税率')
     consumption = tax_result.get('消费税率')
@@ -181,10 +183,16 @@ def parse_details(code, proxy=None):
     if wrap_div is None:
         none_base = BaseInfo(code)
         return Hscode(none_base, None, None, None, None, None)
-    content = soup.find(id='wrap').contents[5].contents[1]
+    content = soup.find(id='wrap').contents[3].contents[1]
+    # print('content', content)
     details = content.find_all('div', class_='cbox')
+    # print('details', details)
     base_info = parse_base_info(code, details)
     tax_info = parse_tax_info(code, details)
+    # declarations = ''
+    # supervisions = ''
+    # quarantines = ''
+    # ciq_codes = ''
     declarations = parse_declaration(code, details)
     supervisions = parse_supervision(code, details)
     quarantines = parse_quarantines(code, details)
@@ -208,8 +216,10 @@ def search_chapter(chapter, include_outdated=False, quiet=False, proxy=None):
         page_num = page_num + 1
     all_code_infos = []
     for code in all_code:
+        # print('code', code)
         # 解析海关编码
         hscode = parse_details(code, proxy)
+        # print('hscode', hscode)
         hscode_str = str(hscode)
         # 检验是否合法json
         if not quiet:
