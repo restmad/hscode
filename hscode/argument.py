@@ -4,7 +4,7 @@
 """
 import os
 DEFAULT_CHAPTER = '01'
-DEFAULT_FILE_ROOT = os.path.join(os.environ['HOME'], 'hscode_file')
+DEFAULT_FILE_ROOT = 'E:\Source\hscode\out'
 
 
 class Argument:
